@@ -34,15 +34,18 @@ jobs:
             gh repo sync $LOCAL_REPO -b $branch --force
           done
 
-      - name: Sync all tags
+      - name: Push tags to own repo
         run: |
-          REMOTE_REPO="MarlinFirmware/Marlin"
-          LOCAL_REPO="CyrusZhou-CN/Marlin"
-
-          # 获取所有远程标签
-          TAGS=$(gh api repos/$REMOTE_REPO/tags --jq '.[].name')
-
-          for tag in $TAGS; do
-            echo "Syncing tag: $tag"
-            gh repo sync $LOCAL_REPO -t $tag --force
+          git fetch --tags
+          git tag -l | while read tag; do
+            echo "Processing tag: $tag"
+            if ! git ls-remote --tags origin | grep -q "refs/tags/$tag"; then
+              git push origin "$tag" || echo "Failed to push tag $tag"
+            else
+              echo "Tag $tag already exists on origin, skipping."
+            fi
           done
+
+      - name: Cleanup
+        run: |
+          git gc --prune=now
