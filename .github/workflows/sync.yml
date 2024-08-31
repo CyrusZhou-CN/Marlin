@@ -31,5 +31,5 @@ jobs:
 
           for branch in $BRANCHES; do
             echo "Syncing branch: $branch"
-            gh repo sync $LOCAL_REPO -b $branch --source $REMOTE_REPO/$branch --force
+            gh repo sync $LOCAL_REPO -b $branch --force
           done
