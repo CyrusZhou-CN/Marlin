@@ -1,4 +1,4 @@
-name: Sync All Branches
+name: Sync All Branches and Tags
 
 on:
   schedule:
@@ -32,4 +32,17 @@ jobs:
           for branch in $BRANCHES; do
             echo "Syncing branch: $branch"
             gh repo sync $LOCAL_REPO -b $branch --force
+          done
+
+      - name: Sync all tags
+        run: |
+          REMOTE_REPO="MarlinFirmware/Marlin"
+          LOCAL_REPO="CyrusZhou-CN/Marlin"
+
+          # 获取所有远程标签
+          TAGS=$(gh api repos/$REMOTE_REPO/tags --jq '.[].name')
+
+          for tag in $TAGS; do
+            echo "Syncing tag: $tag"
+            gh repo sync $LOCAL_REPO -t $tag --force
           done
